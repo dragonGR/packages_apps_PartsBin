@@ -1,0 +1,135 @@
+/*
+* Copyright (C) 2018 The OmniROM Project
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 2 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
+*/
+package com.aicp.device
+
+import PackageManager.NameNotFoundException
+import android.app.AlertDialog
+import android.app.Dialog
+import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
+import android.content.res.Resources
+import android.os.Bundle
+import android.provider.Settings
+import android.text.TextUtils
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.AdapterView.OnItemClickListener
+import android.widget.ListView
+import android.widget.RadioButton
+import android.widget.RadioGroup
+import androidx.preference.ListPreference
+import androidx.preference.Preference
+import androidx.preference.PreferenceCategory
+import androidx.preference.PreferenceFragment
+import androidx.preference.PreferenceManager
+import androidx.preference.PreferenceScreen
+import androidx.preference.TwoStatePreference
+
+class PanelSettings : PreferenceFragment(), RadioGroup.OnCheckedChangeListener {
+    private var mRadioGroup: RadioGroup? = null
+    private var mContext: Context? = null
+    fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        mContext = getContext()
+        mRadioGroup = view.findViewById(R.id.radio_group) as RadioGroup
+        updateRadioButtonState(view.findViewById(R.id.dci_mode), DCIModeSwitch.isSupported(mContext))
+        updateRadioButtonState(view.findViewById(R.id.srgb_mode), SRGBModeSwitch.isSupported(mContext))
+        updateRadioButtonState(view.findViewById(R.id.wide_mode), WideModeSwitch.isSupported(mContext))
+        updateRadioButtonState(view.findViewById(R.id.oneplus_mode), OnePlusModeSwitch.isSupported(mContext))
+        var checkedButtonId: Int = R.id.off_mode
+        if (WideModeSwitch.isCurrentlyEnabled(mContext)) {
+            checkedButtonId = R.id.wide_mode
+        } else if (DCIModeSwitch.isCurrentlyEnabled(mContext)) {
+            checkedButtonId = R.id.dci_mode
+        } else if (SRGBModeSwitch.isCurrentlyEnabled(mContext)) {
+            checkedButtonId = R.id.srgb_mode
+        } else if (OnePlusModeSwitch.isCurrentlyEnabled(mContext)) {
+            checkedButtonId = R.id.oneplus_mode
+        }
+        mRadioGroup.check(checkedButtonId)
+        mRadioGroup.setOnCheckedChangeListener(this)
+    }
+
+    fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {}
+    fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                     savedInstanceState: Bundle?): View {
+        return inflater.inflate(R.layout.panel_modes, container, false)
+    }
+
+    fun onCheckedChanged(group: RadioGroup?, checkedId: Int) {
+        if (checkedId == R.id.srgb_mode) {
+            Utils.writeValue(DCIModeSwitch.getFile(mContext), "0")
+            Settings.System.putInt(getContext().getContentResolver(), DCIModeSwitch.SETTINGS_KEY, 0)
+            Utils.writeValue(WideModeSwitch.getFile(mContext), "0")
+            Settings.System.putInt(getContext().getContentResolver(), WideModeSwitch.SETTINGS_KEY, 0)
+            Utils.writeValue(OnePlusModeSwitch.getFile(mContext), "0")
+            Settings.System.putInt(getContext().getContentResolver(), OnePlusModeSwitch.SETTINGS_KEY, 0)
+            Utils.writeValue(SRGBModeSwitch.getFile(mContext), "1")
+            Settings.System.putInt(getContext().getContentResolver(), SRGBModeSwitch.SETTINGS_KEY, 1)
+        } else if (checkedId == R.id.dci_mode) {
+            Utils.writeValue(DCIModeSwitch.getFile(mContext), "1")
+            Settings.System.putInt(getContext().getContentResolver(), DCIModeSwitch.SETTINGS_KEY, 1)
+            Utils.writeValue(WideModeSwitch.getFile(mContext), "0")
+            Settings.System.putInt(getContext().getContentResolver(), WideModeSwitch.SETTINGS_KEY, 0)
+            Utils.writeValue(OnePlusModeSwitch.getFile(mContext), "0")
+            Settings.System.putInt(getContext().getContentResolver(), OnePlusModeSwitch.SETTINGS_KEY, 0)
+            Utils.writeValue(SRGBModeSwitch.getFile(mContext), "0")
+            Settings.System.putInt(getContext().getContentResolver(), SRGBModeSwitch.SETTINGS_KEY, 0)
+        } else if (checkedId == R.id.wide_mode) {
+            Utils.writeValue(DCIModeSwitch.getFile(mContext), "0")
+            Settings.System.putInt(getContext().getContentResolver(), DCIModeSwitch.SETTINGS_KEY, 0)
+            Utils.writeValue(WideModeSwitch.getFile(mContext), "1")
+            Settings.System.putInt(getContext().getContentResolver(), WideModeSwitch.SETTINGS_KEY, 1)
+            Utils.writeValue(OnePlusModeSwitch.getFile(mContext), "0")
+            Settings.System.putInt(getContext().getContentResolver(), OnePlusModeSwitch.SETTINGS_KEY, 0)
+            Utils.writeValue(SRGBModeSwitch.getFile(mContext), "0")
+            Settings.System.putInt(getContext().getContentResolver(), SRGBModeSwitch.SETTINGS_KEY, 0)
+        } else if (checkedId == R.id.oneplus_mode) {
+            Utils.writeValue(DCIModeSwitch.getFile(mContext), "0")
+            Settings.System.putInt(getContext().getContentResolver(), DCIModeSwitch.SETTINGS_KEY, 0)
+            Utils.writeValue(WideModeSwitch.getFile(mContext), "0")
+            Settings.System.putInt(getContext().getContentResolver(), WideModeSwitch.SETTINGS_KEY, 0)
+            Utils.writeValue(OnePlusModeSwitch.getFile(mContext), "1")
+            Settings.System.putInt(getContext().getContentResolver(), OnePlusModeSwitch.SETTINGS_KEY, 1)
+            Utils.writeValue(SRGBModeSwitch.getFile(mContext), "0")
+            Settings.System.putInt(getContext().getContentResolver(), SRGBModeSwitch.SETTINGS_KEY, 0)
+        } else if (checkedId == R.id.off_mode) {
+            Utils.writeValue(DCIModeSwitch.getFile(mContext), "0")
+            Settings.System.putInt(getContext().getContentResolver(), DCIModeSwitch.SETTINGS_KEY, 0)
+            Utils.writeValue(WideModeSwitch.getFile(mContext), "0")
+            Settings.System.putInt(getContext().getContentResolver(), WideModeSwitch.SETTINGS_KEY, 0)
+            Utils.writeValue(OnePlusModeSwitch.getFile(mContext), "0")
+            Settings.System.putInt(getContext().getContentResolver(), OnePlusModeSwitch.SETTINGS_KEY, 0)
+            Utils.writeValue(SRGBModeSwitch.getFile(mContext), "0")
+            Settings.System.putInt(getContext().getContentResolver(), SRGBModeSwitch.SETTINGS_KEY, 0)
+        }
+    }
+
+    private fun updateRadioButtonState(button: RadioButton, isSupported: Boolean) {
+        if (isSupported) {
+            button.setEnabled(true)
+        } else {
+            button.setEnabled(false)
+        }
+    }
+}
