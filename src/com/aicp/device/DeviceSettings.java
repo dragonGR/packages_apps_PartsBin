@@ -139,14 +139,13 @@ public class DeviceSettings extends PreferenceFragment implements
         setPreferencesFromResource(R.xml.main, rootKey);
 
         final Resources res = getContext().getResources();
-
-        boolean hasAlertSlider = res.getBoolean(com.android.internal.R.bool.config_hasAlertSlider);
         boolean supportsGestures = res.getBoolean(R.bool.config_device_supports_gestures);
         boolean supportsPanels = res.getBoolean(R.bool.config_device_supports_panels);
         boolean supportsSoundtuner = res.getBoolean(R.bool.config_device_supports_soundtuner);
         boolean supportsRefreshrate = res.getBoolean(R.bool.config_device_supports_switch_refreshrate);
 
-        if (hasAlertSlider) {
+        SelfRemovingPreferenceCategory sliderCategory = (SelfRemovingPreferenceCategory) findPreference(KEY_SLIDER_CATEGORY);
+        if (sliderCategory != null) {
             mSliderModeTop = (ListPreference) findPreference(KEY_SLIDER_MODE_TOP);
             mSliderModeTop.setOnPreferenceChangeListener(this);
             int sliderModeTop = getSliderAction(0);
@@ -167,9 +166,6 @@ public class DeviceSettings extends PreferenceFragment implements
             valueIndex = mSliderModeBottom.findIndexOfValue(String.valueOf(sliderModeBottom));
             mSliderModeBottom.setValueIndex(valueIndex);
             mSliderModeBottom.setSummary(mSliderModeBottom.getEntries()[valueIndex]);
-        } else {
-            PreferenceCategory sliderCategory = (PreferenceCategory) findPreference(KEY_SLIDER_CATEGORY);
-            sliderCategory.getParent().removePreference(sliderCategory);
         }
 
         if (supportsSoundtuner) {
@@ -316,30 +312,27 @@ public class DeviceSettings extends PreferenceFragment implements
         }
         if (audiogainsRemoved == 4) audiogainsCategory.getParent().removePreference(audiogainsCategory);
 
-        PreferenceCategory vibratorCategory = (PreferenceCategory) findPreference(KEY_VIBRATOR_CATEGORY);
-        int countVibRemoved = 0;
-        mVibratorSystemStrength = (VibratorSystemStrengthPreference) findPreference(KEY_SYSTEM_VIBSTRENGTH);
-        if (mVibratorSystemStrength != null && mVibratorSystemStrength.isSupported()) {
-            mVibratorSystemStrength.setEnabled(true);
-        } else {
-            mVibratorSystemStrength.getParent().removePreference(mVibratorSystemStrength);
-            countVibRemoved += 1;
-        }
-        mVibratorCallStrength = (VibratorCallStrengthPreference) findPreference(KEY_CALL_VIBSTRENGTH);
-        if (mVibratorCallStrength != null && mVibratorCallStrength.isSupported()) {
+        SelfRemovingPreferenceCategory vibratorCategory = (SelfRemovingPreferenceCategory) findPreference(KEY_VIBRATOR_CATEGORY);
+        if(vibratorCategory !=null) {
+            mVibratorSystemStrength = (VibratorSystemStrengthPreference) findPreference(KEY_SYSTEM_VIBSTRENGTH);
+            if (mVibratorSystemStrength != null && mVibratorSystemStrength.isSupported()) {
+                mVibratorSystemStrength.setEnabled(true);
+            } else {
+                mVibratorSystemStrength.getParent().removePreference(mVibratorSystemStrength);
+            }
+            mVibratorCallStrength = (VibratorCallStrengthPreference) findPreference(KEY_CALL_VIBSTRENGTH);
+            if (mVibratorCallStrength != null && mVibratorCallStrength.isSupported()) {
             mVibratorCallStrength.setEnabled(true);
-        } else {
-            mVibratorCallStrength.getParent().removePreference(mVibratorCallStrength);
-            countVibRemoved += 1;
+            } else {
+                mVibratorCallStrength.getParent().removePreference(mVibratorCallStrength);
+            }
+            mVibratorNotifStrength = (VibratorNotifStrengthPreference) findPreference(KEY_NOTIF_VIBSTRENGTH);
+            if (mVibratorNotifStrength != null && mVibratorNotifStrength.isSupported()) {
+                mVibratorNotifStrength.setEnabled(true);
+            } else {
+                mVibratorNotifStrength.getParent().removePreference(mVibratorNotifStrength);
+            }
         }
-        mVibratorNotifStrength = (VibratorNotifStrengthPreference) findPreference(KEY_NOTIF_VIBSTRENGTH);
-        if (mVibratorNotifStrength != null && mVibratorNotifStrength.isSupported()) {
-            mVibratorNotifStrength.setEnabled(true);
-        } else {
-            mVibratorNotifStrength.getParent().removePreference(mVibratorNotifStrength);
-            countVibRemoved += 1;
-        }
-        if (countVibRemoved == 3) vibratorCategory.getParent().removePreference(vibratorCategory);
     }
 
     private void initRefreshRatePreference(ListPreference preference, String key) {
