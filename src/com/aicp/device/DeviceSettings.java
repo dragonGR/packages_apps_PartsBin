@@ -168,12 +168,10 @@ public class DeviceSettings extends PreferenceFragment implements
             mSliderModeBottom.setSummary(mSliderModeBottom.getEntries()[valueIndex]);
         }
 
-        if (supportsSoundtuner) {
+        SelfRemovingPreferenceCategory soundCategory = (SelfRemovingPreferenceCategory) findPreference(KEY_AUDIO_CATEGORY);
+        if (soundCategory != null) {
             mEnableDolbyAtmos = (SwitchPreference) findPreference(KEY_ENABLE_DOLBY_ATMOS);
             mEnableDolbyAtmos.setOnPreferenceChangeListener(this);
-        } else {
-            PreferenceCategory soundCategory = (PreferenceCategory) findPreference(KEY_AUDIO_CATEGORY);
-            soundCategory.getParent().removePreference(soundCategory);
         }
 
         mHWKSwitch = (TwoStatePreference) findPreference(KEY_HWK_SWITCH);

@@ -16,8 +16,9 @@
 -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory
+    <com.aicp.gear.preference.SelfRemovingPreferenceCategory
         android:key="category_audio"
+        aicpextras:requiresConfig="@bool/config_device_supports_soundtuner"
         android:title="@string/category_audio">
         <SwitchPreference
             android:key="enable_dolby_atmos"
@@ -40,7 +41,7 @@
             android:icon="@drawable/ic_info"
             android:persistent="false"
             android:summary="@string/enable_sound_info" />
-    </PreferenceCategory>
+    </com.aicp.gear.preference.SelfRemovingPreferenceCategory>
 
     <PreferenceCategory
         android:key="category_graphics"
