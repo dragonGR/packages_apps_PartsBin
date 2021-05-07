@@ -18,6 +18,9 @@
 */
 package com.aicp.device;
 
+import static android.provider.Settings.System.MIN_REFRESH_RATE;
+import static android.provider.Settings.System.PEAK_REFRESH_RATE;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ComponentName;
@@ -28,6 +31,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Display;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -44,8 +48,14 @@ import androidx.preference.SwitchPreference;
 
 import com.android.internal.util.aicp.PackageUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
 public class DeviceSettings extends PreferenceFragment implements
         Preference.OnPreferenceChangeListener {
+
+    public static final String TAG = "AicpDeviceSettingsFragment";
 
     public static final String GESTURE_HAPTIC_SETTINGS_VARIABLE_NAME = "OFF_GESTURE_HAPTIC_ENABLE";
     public static final String GESTURE_MUSIC_PLAYBACK_SETTINGS_VARIABLE_NAME = "MUSIC_PLAYBACK_GESTURE_ENABLE";
@@ -91,6 +101,8 @@ public class DeviceSettings extends PreferenceFragment implements
     public static final String KEY_FASTCHARGE_SWITCH = "fastcharge";
     public static final String KEY_REFRESH_RATE = "refresh_rate";
     public static final String KEY_AUTO_REFRESH_RATE = "auto_refresh_rate";
+    private static final String KEY_PEAK_REFRESH_RATE = "peakrefreshrate";
+    private static final String KEY_MIN_REFRESH_RATE = "minrefreshrate";
     private static final String KEY_ENABLE_DOLBY_ATMOS = "enable_dolby_atmos";
     public static final String KEY_OFFSCREEN_GESTURES = "gesture_category";
     public static final String KEY_PANEL_SETTINGS = "panel_category";
@@ -110,6 +122,8 @@ public class DeviceSettings extends PreferenceFragment implements
     private ListPreference mSliderModeTop;
     private ListPreference mSliderModeCenter;
     private ListPreference mSliderModeBottom;
+    private ListPreference mPeakRefreshRatePref;
+    private ListPreference mMinRefreshRatePref;
     private Preference mOffScreenGestures;
     private Preference mPanelSettings;
     private static TwoStatePreference mHBMModeSwitch;
@@ -128,14 +142,13 @@ public class DeviceSettings extends PreferenceFragment implements
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.main, rootKey);
 
-        boolean hasAlertSlider = getContext().getResources().
-                getBoolean(com.android.internal.R.bool.config_hasAlertSlider);
-        boolean supportsGestures = getContext().getResources().getBoolean(R.bool.config_device_supports_gestures);
-        boolean supportsPanels = getContext().getResources().getBoolean(R.bool.config_device_supports_panels);
-        boolean supportsSoundtuner = getContext().getResources()
-                .getBoolean(R.bool.config_device_supports_soundtuner);
-        boolean supportsRefreshrate = getContext().getResources()
-                .getBoolean(R.bool.config_device_supports_switch_refreshrate);
+        final Resources res = getContext().getResources();
+
+        boolean hasAlertSlider = res.getBoolean(com.android.internal.R.bool.config_hasAlertSlider);
+        boolean supportsGestures = res.getBoolean(R.bool.config_device_supports_gestures);
+        boolean supportsPanels = res.getBoolean(R.bool.config_device_supports_panels);
+        boolean supportsSoundtuner = res.getBoolean(R.bool.config_device_supports_soundtuner);
+        boolean supportsRefreshrate = res.getBoolean(R.bool.config_device_supports_switch_refreshrate);
 
         if (hasAlertSlider) {
             mSliderModeTop = (ListPreference) findPreference(KEY_SLIDER_MODE_TOP);
@@ -335,6 +348,42 @@ public class DeviceSettings extends PreferenceFragment implements
             countVibRemoved += 1;
         }
         if (countVibRemoved == 3) vibratorCategory.getParent().removePreference(vibratorCategory);
+
+        mPeakRefreshRatePref = findPreference(KEY_PEAK_REFRESH_RATE);
+        initRefreshRatePreference(mPeakRefreshRatePref, PEAK_REFRESH_RATE);
+        mMinRefreshRatePref = findPreference(KEY_MIN_REFRESH_RATE);
+        initRefreshRatePreference(mMinRefreshRatePref, MIN_REFRESH_RATE);
+    }
+
+    private void initRefreshRatePreference(ListPreference preference, String key) {
+        List<String> entries = new ArrayList<>(), values = new ArrayList<>();
+        Display.Mode mode = getContext().getDisplay().getMode();
+        Display.Mode[] modes = getContext().getDisplay().getSupportedModes();
+        for (Display.Mode m : modes) {
+            if (m.getPhysicalWidth() == mode.getPhysicalWidth() &&
+                    m.getPhysicalHeight() == mode.getPhysicalHeight()) {
+                entries.add(String.format("%.02fHz", m.getRefreshRate())
+                        .replaceAll("[\\.,]00", ""));
+                values.add(String.format(Locale.US, "%.02f", m.getRefreshRate()));
+            }
+        }
+        preference.setEntries(entries.toArray(new String[entries.size()]));
+        preference.setEntryValues(values.toArray(new String[values.size()]));
+        updateRefreshRateSummary(preference, key);
+        preference.setOnPreferenceChangeListener(this);
+    }
+
+    private void updateRefreshRateSummary(ListPreference preference, String key) {
+        final float defaultRefreshRate = (float) getContext().getResources().getInteger(
+                        com.android.internal.R.integer.config_defaultPeakRefreshRate);
+        final float currentValue = Settings.System.getFloat(getContext().getContentResolver(),
+                key, defaultRefreshRate);
+        int index = preference.findIndexOfValue(
+                String.format(Locale.US, "%.02f", currentValue));
+        if (index < 0) index = 0;
+        preference.setValueIndex(index);
+        preference.setSummary(preference.getEntries()[index]);
+        Log.i(TAG, "RefreshRate is set to: " + currentValue);
     }
 
     @Override
@@ -362,6 +411,16 @@ public class DeviceSettings extends PreferenceFragment implements
             setSliderAction(2, sliderMode);
             int valueIndex = mSliderModeBottom.findIndexOfValue(value);
             mSliderModeBottom.setSummary(mSliderModeBottom.getEntries()[valueIndex]);
+        } else if (preference == mPeakRefreshRatePref) {
+            Settings.System.putFloat(getContext().getContentResolver(), PEAK_REFRESH_RATE,
+                    Float.valueOf((String) newValue));
+            Log.i(TAG, "Updating Peak RefreshRate to: " + Float.valueOf((String) newValue));
+            updateRefreshRateSummary(mPeakRefreshRatePref, PEAK_REFRESH_RATE);
+        } else if (preference == mMinRefreshRatePref) {
+            Settings.System.putFloat(getContext().getContentResolver(), MIN_REFRESH_RATE,
+                    Float.valueOf((String) newValue));
+            Log.i(TAG, "Updating Min RefreshRate to: " + Float.valueOf((String) newValue));
+            updateRefreshRateSummary(mMinRefreshRatePref, MIN_REFRESH_RATE);
         } else if (preference == mEnableDolbyAtmos) {
           boolean enabled = (Boolean) newValue;
           Intent daxService = new Intent();
