@@ -99,8 +99,6 @@ public class DeviceSettings extends PreferenceFragment implements
     public static final String KEY_S2S_SWITCH = "sweep_to_sleep";
     public static final String KEY_S2W_SWITCH = "sweep_to_wake";
     public static final String KEY_FASTCHARGE_SWITCH = "fastcharge";
-    public static final String KEY_REFRESH_RATE = "refresh_rate";
-    public static final String KEY_AUTO_REFRESH_RATE = "auto_refresh_rate";
     private static final String KEY_PEAK_REFRESH_RATE = "peakrefreshrate";
     private static final String KEY_MIN_REFRESH_RATE = "minrefreshrate";
     private static final String KEY_ENABLE_DOLBY_ATMOS = "enable_dolby_atmos";
@@ -134,8 +132,6 @@ public class DeviceSettings extends PreferenceFragment implements
     private static TwoStatePreference mDoubleTapToWakeSwitch;
     private static TwoStatePreference mSweepToSleepSwitch;
     private static TwoStatePreference mSweepToWakeSwitch;
-    private static TwoStatePreference mRefreshRate;
-    private static TwoStatePreference mAutoRefreshRate;
     private SwitchPreference mEnableDolbyAtmos;
 
     @Override
@@ -268,14 +264,10 @@ public class DeviceSettings extends PreferenceFragment implements
         if (graphicsRemoved == 3) graphicsCategory.getParent().removePreference(graphicsCategory);
 
         if (supportsRefreshrate) {
-            mAutoRefreshRate = (TwoStatePreference) findPreference(KEY_AUTO_REFRESH_RATE);
-            mAutoRefreshRate.setChecked(AutoRefreshRateSwitch.isCurrentlyEnabled(this.getContext()));
-            mAutoRefreshRate.setOnPreferenceChangeListener(new AutoRefreshRateSwitch(getContext()));
-
-            mRefreshRate = (TwoStatePreference) findPreference(KEY_REFRESH_RATE);
-            mRefreshRate.setEnabled(!AutoRefreshRateSwitch.isCurrentlyEnabled(this.getContext()));
-            mRefreshRate.setChecked(RefreshRateSwitch.isCurrentlyEnabled(this.getContext()));
-            mRefreshRate.setOnPreferenceChangeListener(new RefreshRateSwitch(getContext()));
+            mPeakRefreshRatePref = findPreference(KEY_PEAK_REFRESH_RATE);
+            initRefreshRatePreference(mPeakRefreshRatePref, PEAK_REFRESH_RATE);
+            mMinRefreshRatePref = findPreference(KEY_MIN_REFRESH_RATE);
+            initRefreshRatePreference(mMinRefreshRatePref, MIN_REFRESH_RATE);
         } else {
             PreferenceCategory refreshCategory = (PreferenceCategory) findPreference(KEY_CATEGORY_REFRESH);
             refreshCategory.getParent().removePreference(refreshCategory);
@@ -348,11 +340,6 @@ public class DeviceSettings extends PreferenceFragment implements
             countVibRemoved += 1;
         }
         if (countVibRemoved == 3) vibratorCategory.getParent().removePreference(vibratorCategory);
-
-        mPeakRefreshRatePref = findPreference(KEY_PEAK_REFRESH_RATE);
-        initRefreshRatePreference(mPeakRefreshRatePref, PEAK_REFRESH_RATE);
-        mMinRefreshRatePref = findPreference(KEY_MIN_REFRESH_RATE);
-        initRefreshRatePreference(mMinRefreshRatePref, MIN_REFRESH_RATE);
     }
 
     private void initRefreshRatePreference(ListPreference preference, String key) {
