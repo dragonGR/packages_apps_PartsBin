@@ -27,7 +27,7 @@
     <bool name="config_device_supports_gestures">false</bool>
 
     <!-- Whether device provides panel options -->
-    <bool name="config_device_supports_panels">true</bool>
+    <bool name="config_device_supports_panels">false</bool>
 
     <!-- Whether device supports disabling hwkeys -->
     <string name="pathHWKToggle"></string>

@@ -251,8 +251,8 @@ public class DeviceSettings extends PreferenceFragment implements
             graphicsCategory.removePreference(mDCDModeSwitch);
             graphicsRemoved += 1;
         }
-        if (!supportsPanels) {
-            mPanelSettings.getParent().removePreference(mPanelSettings);
+        SelfRemovingPreference mPanelSettings = (SelfRemovingPreference) findPreference(KEY_PANEL_SETTINGS);
+        if (mPanelSettings == null) {
             graphicsRemoved += 1;
         }
         if (graphicsRemoved == 3) graphicsCategory.getParent().removePreference(graphicsCategory);

@@ -59,16 +59,17 @@
             android:title="@string/hbm_mode_title"
             android:persistent="false" />
 
-        <Preference
+        <com.aicp.gear.preference.SelfRemovingPreference
             android:key="panel_category"
             android:title="@string/panel_category_title"
             android:icon="@drawable/ic_panel"
             android:summary="@string/panel_category_summary"
-            android:persistent="false" >
+            android:persistent="false"
+            aicpextras:requiresConfig="@bool/config_device_supports_panels">
             <intent android:action="android.intent.action.MAIN"
                     android:targetPackage="com.aicp.device"
                     android:targetClass="com.aicp.device.PanelSettingsActivity" />
-        </Preference>
+        </com.aicp.gear.preference.SelfRemovingPreference>
     </PreferenceCategory>
 
     <com.aicp.gear.preference.SelfRemovingPreferenceCategory
