@@ -29,6 +29,9 @@
     <!-- Whether device provides panel options -->
     <bool name="config_device_supports_panels">false</bool>
 
+    <!-- Whether device supports vibration options -->
+    <bool name="config_device_supports_vibrations">false</bool>
+
     <!-- Whether device supports disabling hwkeys -->
     <string name="pathHWKToggle"></string>
 

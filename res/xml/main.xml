@@ -217,8 +217,8 @@
 
     <com.aicp.gear.preference.SelfRemovingPreferenceCategory
         android:key="category_vibrator"
-        aicpextras:requiresConfig="@string/pathSystemVibStrength"
-        android:title="@string/category_vibrator">
+        android:title="@string/category_vibrator"
+        aicpextras:requiresConfig="@bool/config_device_supports_vibrations">
         <com.aicp.device.VibratorSystemStrengthPreference
             android:key="vib_system_strength"
             android:title="@string/vib_strength_title"

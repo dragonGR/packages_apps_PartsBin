@@ -309,7 +309,7 @@ public class DeviceSettings extends PreferenceFragment implements
         if (audiogainsRemoved == 4) audiogainsCategory.getParent().removePreference(audiogainsCategory);
 
         SelfRemovingPreferenceCategory vibratorCategory = (SelfRemovingPreferenceCategory) findPreference(KEY_VIBRATOR_CATEGORY);
-        if(vibratorCategory !=null) {
+        if(vibratorCategory != null) {
             mVibratorSystemStrength = (VibratorSystemStrengthPreference) findPreference(KEY_SYSTEM_VIBSTRENGTH);
             if (mVibratorSystemStrength != null && mVibratorSystemStrength.isSupported()) {
                 mVibratorSystemStrength.setEnabled(true);
