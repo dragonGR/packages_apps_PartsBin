@@ -46,6 +46,7 @@ import androidx.preference.PreferenceScreen;
 import androidx.preference.TwoStatePreference;
 import androidx.preference.SwitchPreference;
 
+import com.aicp.gear.preference.SelfRemovingPreferenceCategory;
 import com.android.internal.util.aicp.PackageUtils;
 
 import java.util.ArrayList;
@@ -71,7 +72,7 @@ public class DeviceSettings extends PreferenceFragment implements
     private static final String KEY_AUDIO_CATEGORY = "category_audio";
     private static final String KEY_BUTTON_CATEGORY = "category_buttons";
     private static final String KEY_GRAPHICS_CATEGORY = "category_graphics";
-    private static final String KEY_CATEGORY_REFRESH = "category_refresh";
+    private static final String KEY_REFRESH_CATEGORY = "category_refresh";
     private static final String KEY_VIBRATOR_CATEGORY = "category_vibrator";
     private static final String KEY_SLIDER_CATEGORY = "category_slider";
     private static final String KEY_GESTURES_CATEGORY = "category_gestures";
@@ -142,7 +143,6 @@ public class DeviceSettings extends PreferenceFragment implements
         boolean supportsGestures = res.getBoolean(R.bool.config_device_supports_gestures);
         boolean supportsPanels = res.getBoolean(R.bool.config_device_supports_panels);
         boolean supportsSoundtuner = res.getBoolean(R.bool.config_device_supports_soundtuner);
-        boolean supportsRefreshrate = res.getBoolean(R.bool.config_device_supports_switch_refreshrate);
 
         SelfRemovingPreferenceCategory sliderCategory = (SelfRemovingPreferenceCategory) findPreference(KEY_SLIDER_CATEGORY);
         if (sliderCategory != null) {
@@ -257,14 +257,12 @@ public class DeviceSettings extends PreferenceFragment implements
         }
         if (graphicsRemoved == 3) graphicsCategory.getParent().removePreference(graphicsCategory);
 
-        if (supportsRefreshrate) {
+        SelfRemovingPreferenceCategory refreshCategory = (SelfRemovingPreferenceCategory) findPreference(KEY_REFRESH_CATEGORY);
+        if (refreshCategory != null) {
             mPeakRefreshRatePref = findPreference(KEY_PEAK_REFRESH_RATE);
             initRefreshRatePreference(mPeakRefreshRatePref, PEAK_REFRESH_RATE);
             mMinRefreshRatePref = findPreference(KEY_MIN_REFRESH_RATE);
             initRefreshRatePreference(mMinRefreshRatePref, MIN_REFRESH_RATE);
-        } else {
-            PreferenceCategory refreshCategory = (PreferenceCategory) findPreference(KEY_CATEGORY_REFRESH);
-            refreshCategory.getParent().removePreference(refreshCategory);
         }
 
         PreferenceCategory powerCategory = (PreferenceCategory) findPreference(KEY_POWER_CATEGORY);

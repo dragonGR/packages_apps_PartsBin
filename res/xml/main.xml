@@ -14,7 +14,8 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aicpextras="http://schemas.android.com/apk/res-auto">
 
     <com.aicp.gear.preference.SelfRemovingPreferenceCategory
         android:key="category_audio"
@@ -70,9 +71,10 @@
         </Preference>
     </PreferenceCategory>
 
-    <PreferenceCategory
+    <com.aicp.gear.preference.SelfRemovingPreferenceCategory
         android:key="category_refresh"
-        android:title="@string/refresh_title">
+        android:title="@string/refresh_title"
+        aicpextras:requiresConfig="@bool/config_device_supports_switch_refreshrate">
 
         <ListPreference
             android:key="peakrefreshrate"
@@ -88,7 +90,7 @@
             android:icon="@drawable/ic_info"
             android:persistent="false"
             android:summary="@string/refresh_rate_warning"/>
-    </PreferenceCategory>
+    </com.aicp.gear.preference.SelfRemovingPreferenceCategory>
 
     <PreferenceCategory
         android:key="category_gestures"
