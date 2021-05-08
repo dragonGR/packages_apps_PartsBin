@@ -30,7 +30,7 @@ import android.util.Log;
 public class Utils {
 
     private static final boolean DEBUG = false;
-    private static final String TAG = "Utils";
+    private static final String TAG = "PBUtils";
 
     /**
      * Write a string value to the specified file.
@@ -202,8 +202,9 @@ public class Utils {
      */
     public static boolean getFileValueAsBoolean(String filename, boolean defValue) {
         String fileValue = readLine(filename);
-        if(fileValue!=null){
-            return (fileValue.equals("0")?false:true);
+        if (DEBUG) Log.d(TAG, "getFileValueAsBoolean: " + fileValue + " :" + !"0".equals(fileValue));
+        if (fileValue != null && !fileValue.isEmpty()){
+            return ("0".equals(fileValue) ? false : true);
         }
         return defValue;
     }
@@ -215,7 +216,7 @@ public class Utils {
      */
     public static String getFileValue(String filename, String defValue) {
         String fileValue = readLine(filename);
-        if(fileValue!=null){
+        if(fileValue != null && !fileValue.isEmpty()){
             return fileValue;
         }
         return defValue;
