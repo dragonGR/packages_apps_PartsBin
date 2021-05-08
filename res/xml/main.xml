@@ -124,16 +124,17 @@
             android:title="@string/sweep_to_sleep_title"
             android:persistent="false" />
 
-        <Preference
+        <com.aicp.gear.preference.SelfRemovingPreference
             android:key="gesture_category"
             android:title="@string/category_gestures_title"
             android:icon="@drawable/ic_gesture"
             android:summary="@string/category_gestures_summary"
-            android:persistent="false" >
+            android:persistent="false"
+            aicpextras:requiresConfig="@bool/config_device_supports_gestures">
             <intent android:action="android.intent.action.MAIN"
                     android:targetPackage="com.aicp.device"
                     android:targetClass="com.aicp.device.GestureSettingsActivity" />
-        </Preference>
+        </com.aicp.gear.preference.SelfRemovingPreference>
     </PreferenceCategory>
 
     <com.aicp.gear.preference.SelfRemovingPreferenceCategory

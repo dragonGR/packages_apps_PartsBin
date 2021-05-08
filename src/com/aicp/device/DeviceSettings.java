@@ -46,6 +46,7 @@ import androidx.preference.PreferenceScreen;
 import androidx.preference.TwoStatePreference;
 import androidx.preference.SwitchPreference;
 
+import com.aicp.gear.preference.SelfRemovingPreference;
 import com.aicp.gear.preference.SelfRemovingPreferenceCategory;
 import com.android.internal.util.aicp.PackageUtils;
 
@@ -185,7 +186,6 @@ public class DeviceSettings extends PreferenceFragment implements
         }
 
         PreferenceCategory gesturesCategory = (PreferenceCategory) findPreference(KEY_GESTURES_CATEGORY);
-        mOffScreenGestures = (Preference) findPreference(KEY_OFFSCREEN_GESTURES);
         int gesturesRemoved = 0;
         mSTapSwitch = (TwoStatePreference) findPreference(KEY_STAP_SWITCH);
         if (mSTapSwitch != null && SingleTapSwitch.isSupported(getContext())){
@@ -223,8 +223,8 @@ public class DeviceSettings extends PreferenceFragment implements
             gesturesCategory.removePreference(mSweepToWakeSwitch);
             gesturesRemoved += 1;
         }
-        if (!supportsGestures) {
-            mOffScreenGestures.getParent().removePreference(mOffScreenGestures);
+        SelfRemovingPreference mOffScreenGestures = (SelfRemovingPreference) findPreference(KEY_OFFSCREEN_GESTURES);
+        if (mOffScreenGestures == null) {
             gesturesRemoved += 1;
         }
         if (gesturesRemoved == 5) gesturesCategory.getParent().removePreference(gesturesCategory);
