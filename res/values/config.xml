@@ -90,9 +90,9 @@
     <string name="pathNotifVibStrength"></string>
 
     <!-- Device vibrator min-max-default values -->
-    <integer name="vibratorMinMV"></integer>
-    <integer name="vibratorMaxMV"></integer>
-    <integer name="vibratorDefaultMV"></integer>
+    <integer name="vibratorMinMV">0</integer>
+    <integer name="vibratorMaxMV">0</integer>
+    <integer name="vibratorDefaultMV">0</integer>
 
     <!-- Device earpiece gain sysfs -->
     <string name="pathAudioEarpieceGain"></string>
