@@ -17,8 +17,7 @@
 
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
-    <bool name="config_device_has_hw_nav_buttons">false</bool>
-
+    <!-- Whether device supports different refreshrate options -->
     <bool name="config_device_supports_switch_refreshrate">false</bool>
 
     <bool name="config_device_supports_soundtuner">false</bool>
@@ -33,6 +32,9 @@
     <bool name="config_device_supports_vibrations">false</bool>
 
     <!-- Whether device supports disabling hwkeys -->
+    <bool name="config_device_has_hw_nav_buttons">false</bool>
+
+    <!-- Path to hardware keys toggle sysfs -->
     <string name="pathHWKToggle"></string>
 
     <!-- Path to devices FastCharge sysfs -->
